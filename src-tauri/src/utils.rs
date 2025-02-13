@@ -9,6 +9,7 @@ use std::path::PathBuf;
 use std::fs::File;
 use std::io::{self, Write};
 use std::error::Error;
+use reqwest::blocking::get;
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct SelectedData {
@@ -249,4 +250,31 @@ pub fn create_srt(subtitles: Vec<(String, f64, f64)>) -> Result<String, Box<dyn 
     }
 
     Ok(filename)
+}
+
+pub async fn download_model(url: &str, model_name: &str) -> Result<PathBuf, Box<dyn Error>> {
+    let temp_dir = env::temp_dir();
+    let srtify_dir = temp_dir.join("srtify");
+    fs::create_dir_all(&srtify_dir).expect("Failed to create srtify directory");
+    let model_path = srtify_dir.join(model_name);
+    if Path::new(&model_path).exists() {
+        return Ok(model_path);
+    }
+
+    let response = reqwest::get(url).await?;
+    
+    if !response.status().is_success() {
+        return Err(format!("Failed to download model from URL: {}", url).into());
+    }
+
+    // Create parent directories if needed
+    if let Some(parent) = Path::new(&model_path).parent() {
+        fs::create_dir_all(parent)?;
+    }
+
+    let mut file = fs::File::create(model_path.clone())?;
+    let bytes = response.bytes().await?;
+    file.write_all(&bytes)?;
+
+    Ok(model_path)
 }

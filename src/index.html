@@ -20,11 +20,16 @@
 			<div class="input-group">
 				<label for="model">Whisper Model:</label>
 				<div style="position: relative; flex-grow: 1; max-width: 80%;">
-				  <input id="model" type="text" onclick="showDropdown()" placeholder="/base.en.bin" style="width: -webkit-fill-available;">
+				  <input id="model" type="text" onclick="showDropdown()" placeholder="whisper-base" style="width: -webkit-fill-available;">
 				  <div id="modelDropdown" class="dropdown two">
-					<div class="dropdown-item" onclick="selectModel('whisper-tiny')">/base.en.bin</div>
-					<div class="dropdown-item" onclick="selectModel('whisper-base')">/base.es.bin</div>
-					<div class="dropdown-item" onclick="selectModel('whisper-large')">/base.de.bin</div>
+					<div class="dropdown-item" onclick="selectModel('whisper-base')">whisper-base</div>
+					<div class="dropdown-item" onclick="selectModel('whisper-tiny')">whisper-tiny</div>
+					<div class="dropdown-item" onclick="selectModel('whisper-small')">whisper-small</div>
+					<div class="dropdown-item" onclick="selectModel('whisper-medium')">whisper-medium</div>
+					<div class="dropdown-item" onclick="selectModel('whisper-large-v1')">whisper-large-v1</div>
+					<div class="dropdown-item" onclick="selectModel('whisper-large-v2')">whisper-large-v2</div>
+					<div class="dropdown-item" onclick="selectModel('whisper-large-v3')">whisper-large-v3</div>
+					<div class="dropdown-item" onclick="selectModel('whisper-large-v3-turbo')">whisper-large-v3-turbo</div>
 				  </div>
 				</div>
 				<button id="modelFile" class="cp three">Select Whisper Model</button>

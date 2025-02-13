@@ -7,6 +7,7 @@ listen('info', function (event) {
     autoScroll();
 });
 listen('transcription_started', function (event) {
+    consoleElement.innerHTML = "";
     let generateSubtitle = document.getElementById("generateSubtitle");
     generateSubtitle.innerText = "Generating...,"
     generateSubtitle.style.pointerEvents = "none";
@@ -79,10 +80,11 @@ function showDropdown() {
         dropdown.style.display = 'block';  // Show the dropdown when input is clicked
     }
 }
-function selectModel(model) {
+async function selectModel(model) {
     const input = document.getElementById('model');
-    input.value = model;  // Set the selected value in the input
+    input.value = model;
     hideDropdown();
+    await save_selection("model", input.value);
 }
 function hideDropdown() {
     const dropdown = document.getElementById('modelDropdown');

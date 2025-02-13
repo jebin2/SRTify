@@ -3,9 +3,10 @@ use std::fs::File;
 use std::io::Read;
 use anyhow::Result;
 
-use crate::utils::{ load_selection, is_video_or_audio, extract_audio, create_srt };
+use crate::utils::{ load_selection, is_video_or_audio, extract_audio, create_srt, download_model };
 use tauri::{AppHandle, Emitter};
 use std::sync::{Arc, Mutex};
+use std::path::Path;
 
 #[tauri::command]
 pub async fn start_transcription(
@@ -14,9 +15,9 @@ pub async fn start_transcription(
     let model_result = load_selection("model".to_string());
     let media_file_result = load_selection("file".to_string());
 
-    let model = match model_result {
+    let mut model = match model_result {
         Ok(Some(m)) => m,
-        Ok(None) => "whisper".to_string(),
+        Ok(None) => "whisper-base".to_string(),
         Err(e) => return Err(format!("Error loading model: {}", e)),
     };
 
@@ -26,9 +27,67 @@ pub async fn start_transcription(
         Err(e) => return Err(format!("Error loading media file: {}", e)),
     };
 
-    let result = transcribe_with_whisper(media_file, &model, app).await.map_err(|e| e.to_string());
+    // Determine both the download URL and the actual filename
+    let (download_url, model_filename) = match model.as_str() {
+        "whisper-base" => (
+            "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin".to_string(),
+            "ggml-base.en.bin".to_string()
+        ),
+        "whisper-tiny" => (
+            "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.en.bin".to_string(),
+            "ggml-tiny.en.bin".to_string()
+        ),
+        "whisper-small" => (
+            "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.en.bin".to_string(),
+            "ggml-small.en.bin".to_string()
+        ),
+        "whisper-medium" => (
+            "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.en.bin".to_string(),
+            "ggml-medium.en.bin".to_string()
+        ),
+        "whisper-large-v1" => (
+            "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v1.bin".to_string(),
+            "ggml-large-v1.bin".to_string()
+        ),
+        "whisper-large-v2" => (
+            "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v2.bin".to_string(),
+            "ggml-large-v2.bin".to_string()
+        ),
+        "whisper-large-v3" => (
+            "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3.bin".to_string(),
+            "ggml-large-v3.bin".to_string()
+        ),
+        "whisper-large-v3-turbo" => (
+            "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin".to_string(),
+            "ggml-large-v3-turbo.bin".to_string()
+        ),
+        _ => {
+            (model.clone(), model.clone())
+        }
+    };
 
-    result
+    // Download if needed
+    if download_url.starts_with("https://") {
+        match download_model(&download_url, &model_filename).await {
+            Ok(new_path) => {
+                model = new_path.to_string_lossy().to_string();
+                app.emit("info", format!("Downloaded model: {}", model_filename)).unwrap_or_else(|e| {
+                    eprintln!("Emit error: {}", e);
+                });
+            },
+            Err(e) => return Err(format!("Error downloading model: {}", e)),
+        }
+    }
+
+    // Verify model file exists
+    if !Path::new(&model).exists() {
+        return Err(format!("Model file not found at path: {}", model));
+    }
+
+    // Run transcription
+    transcribe_with_whisper(media_file, &model, app)
+        .await
+        .map_err(|e| e.to_string())
 }
 
 async fn transcribe_with_whisper(
