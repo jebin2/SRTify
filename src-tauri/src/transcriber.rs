@@ -100,7 +100,10 @@ async fn transcribe_with_whisper(
             eprintln!("Emit error: {}", e);
         });
         let app_clone = app.clone();
-        file_path  = extract_audio(&file_path, app_clone);
+        file_path = match extract_audio(&file_path, app_clone) {
+            Ok(path) => path,
+            Err(e) => return Err(anyhow::anyhow!("Error in extract_audio")),
+        };
         app.emit("info", "Extracted audio").unwrap_or_else(|e| {
             eprintln!("Emit error: {}", e);
         });
@@ -126,7 +129,6 @@ async fn transcribe_with_whisper(
     params.set_print_timestamps(false);
     params.set_print_special(false);
 
-    let app_clone = app.clone();
     app.emit("transcription_started", "TRANSCRIPTION_STARTED").unwrap_or_else(|e| {
         eprintln!("Emit error: {}", e);
     });

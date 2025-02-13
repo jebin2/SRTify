@@ -148,11 +148,11 @@ pub fn load_selection(key: String) -> Result<Option<String>, String> {
 fn get_ffmpeg_path(app: tauri::AppHandle) -> Result<PathBuf, String> {
     let target_os = std::env::consts::OS;
     let path = match target_os {
-        "linux" => "bin/linux-x64/ffmpeg",
-        "macos" => "bin/macos-x64/ffmpeg",
-        "windows" => "bin/win32-x64/ffmpeg.exe",
-        _ => panic!("Unsupported target OS: {}", target_os),
-    };
+        "linux" => Ok("bin/linux-x64/ffmpeg"),
+        "macos" => Ok("bin/macos-x64/ffmpeg"),
+        "windows" => Ok("bin/win32-x64/ffmpeg.exe"),
+        _ => Err(format!("Unsupported target OS: {}", target_os)),
+    }?;
     let resource_path = app.path()
         .resolve(path, tauri::path::BaseDirectory::Resource)
         .map_err(|e| format!("Failed to resolve FFmpeg path: {}", e))?;
@@ -165,11 +165,11 @@ fn get_ffmpeg_path(app: tauri::AppHandle) -> Result<PathBuf, String> {
     Ok(resource_path)
 }
 
-pub fn extract_audio(video_path: &str, app: tauri::AppHandle) -> String {
+pub fn extract_audio(video_path: &str, app: tauri::AppHandle) -> Result<String, String> {
     let ffmpeg_path = get_ffmpeg_path(app).expect("Failed to get FFmpeg path");
 
     if !ffmpeg_path.exists() {
-        panic!("FFmpeg binary not found at {:?}", ffmpeg_path);
+        return Err(format!("FFmpeg binary not found at {:?}", ffmpeg_path).to_string());
     }
     println!("ffmpeg_path {:?}", ffmpeg_path);
     let temp_dir = env::temp_dir();
@@ -194,7 +194,7 @@ pub fn extract_audio(video_path: &str, app: tauri::AppHandle) -> String {
         .output()
         .expect("Failed to extract audio");
 
-    audio_output.to_str().unwrap().to_string()
+    Ok(audio_output.to_str().unwrap().to_string())
 }
 
 pub fn is_video_or_audio(file_path: &str) -> Option<&'static str> {
