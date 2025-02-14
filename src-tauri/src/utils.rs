@@ -226,7 +226,7 @@ fn sec_to_time_format(sec: f64) -> String {
     format!("{:02}:{:02}:{:02},{:03}", hours, minutes, seconds, milliseconds)
 }
 
-pub fn create_srt(subtitles: Vec<(String, f64, f64)>) -> Result<String, Box<dyn Error>> {
+pub fn create_srt(subtitles: Vec<(String, f64, f64)>, app: tauri::AppHandle) -> Result<String, Box<dyn Error>> {
     let folder_res = load_selection("folder".to_string());
 
     let folder = match folder_res {
@@ -249,7 +249,12 @@ pub fn create_srt(subtitles: Vec<(String, f64, f64)>) -> Result<String, Box<dyn 
         writeln!(file, "{}\n{} --> {}\n{}\n", i + 1, start_time, end_time, text)
             .map_err(|e| format!("Failed to write to SRT file: {}", e))?;
     }
-
+    app.emit("subtitle_created", format!("Subtitle Created At{}", filename)).unwrap_or_else(|e| {
+        eprintln!("Emit error: {}", e);
+    });
+    app.emit("info", "End").unwrap_or_else(|e| {
+        eprintln!("Emit error: {}", e);
+    });
     Ok(filename)
 }
 

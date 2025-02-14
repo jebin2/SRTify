@@ -189,7 +189,7 @@ async fn transcribe_with_whisper(
             eprintln!("Emit error: {}", e);
         });
 
-    if let Err(e) = create_srt(subtitles.lock().unwrap().clone()) {
+    if let Err(e) = create_srt(subtitles.lock().unwrap().clone(), app) {
         eprintln!("Error creating SRT: {}", e);
     }
 

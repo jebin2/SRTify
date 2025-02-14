@@ -9,6 +9,7 @@ const modelInput = document.getElementById("model");
 const mediaFileInput = document.getElementById("mediaFile");
 const outputDirInput = document.getElementById("outputDir");
 const modelDropdown = document.getElementById('modelDropdown');
+let max_progress = 0;
 
 // --- Utility Functions ---
 async function invokeAPI(method, ...args) {
@@ -56,7 +57,10 @@ listen('transcription_progress', (event) => {
 
 listen('transcription_complete', () => {
     setGeneratingState(false);
-    updateProgress(100, "transcription");
+});
+listen('subtitle_created', (event) => {
+    setGeneratingState(false);
+    appendConsoleMessage(`<span style="color:green">${event.payload}</span>`);
 });
 
 listen('transcription_cancelled', (event) => {
@@ -131,6 +135,9 @@ document.getElementById("selectFile").addEventListener("click", () => selectFile
 document.getElementById("selectFolder").addEventListener("click", () => selectFolder());
 
 generateSubtitleButton.addEventListener("click", async () => {
+    max_progress = 0;
+    progressBar.style.width = '0%';
+    consoleElement.innerHTML = ""
     await invokeAPI("start_transcription");
 });
 
@@ -163,17 +170,12 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 function updateProgress(progress, type) {
     const clampedProgress = parseInt(Math.max(0, Math.min(100, progress)));
-    if (clampedProgress >= 100) {
-        clampedProgress = 100;
+    if (max_progress <= clampedProgress) {
+        max_progress = clampedProgress;
+        if (max_progress >= 100) {
+            max_progress = 100;
+        }
     }
-    progressBar.style.width = `${clampedProgress}%`;
-    buttonTextElement.innerText = type == "download" ? "Downloading Model... "+clampedProgress+"%" : "Generating Subtitle... "+clampedProgress+"%";
-    
-    if (clampedProgress >= 100) {
-        console.log(clampedProgress);
-        setTimeout(() => {
-            progressBar.style.width = '0%';
-            generateSubtitleButton.classList.remove('generating');
-        }, 1000);
-    }
+    progressBar.style.width = `${max_progress}%`;
+    buttonTextElement.innerText = type == "download" ? "Downloading Model... "+max_progress+"%" : "Generating Subtitle... "+max_progress+"%";
 }
