@@ -12,34 +12,42 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
 
+        html, body {
+            height: 100%;
+        }
+
         body {
             background: #000;
             color: #fff;
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
         .container {
+            flex: 1;
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
-            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 100px);
         }
 
         header {
             text-align: center;
-            margin-bottom: 4rem;
+            margin-bottom: 2rem;
         }
 
         h1 {
-            font-size: 3.5rem;
+            font-size: 3rem;
             letter-spacing: -0.05em;
-            margin: 2rem 0;
+            margin: 1rem 0;
         }
 
         .description {
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto 3rem;
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto 2rem;
             color: #ccc;
             text-align: center;
         }
@@ -60,23 +68,23 @@
         }
 
         .screenshot {
-            margin: 4rem 0;
+            flex: 1;
+            min-height: 300px;
             background: #111;
-            padding: 1rem;
+            margin: 1rem 0;
             border-radius: 8px;
-        }
-
-        .dependencies {
-            border-top: 1px solid #333;
-            padding: 2rem 0;
-            margin-top: 4rem;
+            display: grid;
+            place-items: center;
         }
 
         footer {
             text-align: center;
-            margin-top: 4rem;
-            padding: 2rem 0;
+            padding: 1.5rem 0;
             border-top: 1px solid #333;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-shrink: 0;
         }
 
         a {
@@ -84,10 +92,53 @@
             text-decoration: none;
             border-bottom: 1px solid #666;
             transition: border-color 0.2s;
+            cursor: pointer;
         }
 
         a:hover {
             border-color: #fff;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            padding: 2rem;
+        }
+
+        .modal-content {
+            background: #000;
+            max-width: 500px;
+            margin: 2rem auto;
+            padding: 2rem;
+            border: 1px solid #333;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0 0.5rem;
+        }
+
+        .dependency-list {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .dependency-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #333;
         }
     </style>
 </head>
@@ -95,33 +146,65 @@
     <div class="container">
         <header>
             <h1>SRTify</h1>
-            <p class="description">Create accurate subtitles for video/audio files with AI-powered precision. Available for Windows, macOS, and Linux.</p>
+            <p class="description">Create accurate subtitles for video/audio files with AI-powered precision.</p>
             <a href="#" class="cta-button">Download for macOS</a>
         </header>
 
         <div class="screenshot">
             <!-- Replace with actual screenshot -->
-            <div style="background: #222; height: 400px; display: grid; place-items: center; color: #666;">
-                App Screenshot
+            <div style="background: #222; width: 100%; height: 100%; display: grid; place-items: center; color: #666;">
+                App Screenshot (16:9)
             </div>
         </div>
 
-        <div class="dependencies">
-            <h3>Dependencies</h3>
-            <ul style="margin-top: 1rem; list-style: none;">
-                <li>• Tauri 2.0</li>
-                <li>• Whisper.cpp</li>
-                <li>• FFmpeg</li>
-            </ul>
-        </div>
-
         <footer>
-            <p>
-                <a href="https://github.com/jebin2/srtify" target="_blank">View on GitHub</a> 
-                | 
-                <a href="/">Home</a>
-            </p>
+            <a href="https://github.com/yourusername/srtify" target="_blank">GitHub</a>
+            <a href="/">Home</a>
+            <a onclick="showDependencies()">Dependencies</a>
         </footer>
     </div>
+
+    <!-- Dependencies Modal -->
+    <div id="dependencyModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h3>Project Dependencies</h3>
+            <ul class="dependency-list">
+                <li>Tauri 2.0</li>
+                <li>Whisper.cpp</li>
+                <li>FFmpeg</li>
+                <li>Rust 1.62+</li>
+                <li>Node.js 18+</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function showDependencies() {
+            document.getElementById('dependencyModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('dependencyModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('dependencyModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Enforce aspect ratio for screenshot container
+        function maintainAspectRatio() {
+            const screenshot = document.querySelector('.screenshot');
+            const viewportWidth = window.innerWidth;
+            const maxHeight = window.innerHeight * 0.5;
+            screenshot.style.height = Math.min(viewportWidth * 0.5625, maxHeight) + 'px';
+        }
+
+        window.addEventListener('resize', maintainAspectRatio);
+        maintainAspectRatio();
+    </script>
 </body>
 </html>
