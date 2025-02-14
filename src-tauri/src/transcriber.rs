@@ -115,7 +115,7 @@ async fn transcribe_with_whisper(
         let app_clone = app.clone();
         file_path = match extract_audio(&file_path, app_clone) {
             Ok(path) => path,
-            Err(e) => return Err(anyhow::anyhow!("Error in extract_audio")),
+            Err(_) => return Err(anyhow::anyhow!("Error in extract_audio")),
         };
         app.emit("info", "Extracted audio").unwrap_or_else(|e| {
             eprintln!("Emit error: {}", e);

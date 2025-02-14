@@ -8,7 +8,7 @@ mod utils;
 #[tokio::main]
 async fn main() {
     tauri::Builder::default()
-        .setup(|app| {
+        .setup(|_app| {
             // Spawn the local HTTP server
             tokio::spawn(async {
                 local_server::start_server().await;
