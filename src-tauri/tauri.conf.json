@@ -13,7 +13,13 @@
 			{
 				"title": "SRTify",
 				"width": 1280,
-				"height": 720
+				"height": 720,
+				"backgroundColor": "#000000",
+				"theme": "Dark",
+				"decorations": true,
+				"transparent": true,
+				"center": true,
+				"devtools": false
 			}
 		],
 		"security": {
