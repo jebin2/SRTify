@@ -37,6 +37,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
+          enablement: true,
           path: 'dashboard'
       - name: Deploy to GitHub Pages
         id: deployment
