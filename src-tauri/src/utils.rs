@@ -1,5 +1,6 @@
 use rfd::FileDialog;
 use serde::{Deserialize, Serialize};
+use futures::StreamExt;
 use std::env;
 use std::fs;
 use tauri::{AppHandle, Emitter, Manager};
@@ -7,9 +8,9 @@ use std::process::Command;
 use std::path::Path;
 use std::path::PathBuf;
 use std::fs::File;
-use std::io::{self, Write};
+use std::io::Write;
 use std::error::Error;
-use reqwest::blocking::get;
+use hound::WavReader;
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct SelectedData {
@@ -252,14 +253,25 @@ pub fn create_srt(subtitles: Vec<(String, f64, f64)>) -> Result<String, Box<dyn 
     Ok(filename)
 }
 
-pub async fn download_model(url: &str, model_name: &str) -> Result<PathBuf, Box<dyn Error>> {
+pub async fn download_model(url: &str, model_name: &str, app: AppHandle) -> Result<PathBuf, Box<dyn Error>> {
     let temp_dir = env::temp_dir();
     let srtify_dir = temp_dir.join("srtify");
     fs::create_dir_all(&srtify_dir).expect("Failed to create srtify directory");
     let model_path = srtify_dir.join(model_name);
+    
     if Path::new(&model_path).exists() {
         return Ok(model_path);
     }
+
+    // Emit download start event
+    let start_event = serde_json::json!({
+        "status": "download_start",
+        "model": model_name,
+        "progress": 0.0
+    });
+    app.emit("download_progress", start_event).unwrap_or_else(|e| {
+        eprintln!("Emit error: {}", e);
+    });
 
     let response = reqwest::get(url).await?;
     
@@ -273,8 +285,54 @@ pub async fn download_model(url: &str, model_name: &str) -> Result<PathBuf, Box<
     }
 
     let mut file = fs::File::create(model_path.clone())?;
-    let bytes = response.bytes().await?;
-    file.write_all(&bytes)?;
+    let total_size = response.content_length().unwrap_or(0);
+    let mut downloaded = 0;
+    let mut stream = response.bytes_stream();
+
+    while let Some(chunk) = stream.next().await {
+        let chunk = chunk?;
+        downloaded += chunk.len() as u64;
+        file.write_all(&chunk)?;
+        
+        // Calculate progress percentage if we know total size
+        let progress = if total_size > 0 {
+            (downloaded as f64 / total_size as f64) * 100.0
+        } else {
+            // Use -1 to indicate unknown total size
+            -1.0
+        };
+
+        // Emit progress update
+        let progress_event = serde_json::json!({
+            "status": "download_progress",
+            "model": model_name,
+            "progress": progress,
+            "downloaded": downloaded,
+            "total_size": total_size
+        });
+        app.emit("download_progress", progress_event).unwrap_or_else(|e| {
+            eprintln!("Emit error: {}", e);
+        });
+    }
+
+    // Emit completion event
+    let complete_event = serde_json::json!({
+        "status": "download_complete",
+        "model": model_name,
+        "path": model_path.to_str(),
+        "progress": 100
+    });
+    app.emit("download_progress", complete_event).unwrap_or_else(|e| {
+        eprintln!("Emit error: {}", e);
+    });
 
     Ok(model_path)
+}
+
+pub fn get_audio_duration(file_path: &str) -> Result<f64, hound::Error> {
+    let reader = WavReader::open(file_path)?;
+    let spec = reader.spec();
+    
+    let duration = reader.duration() as f64 / spec.sample_rate as f64;
+    Ok(duration)
 }

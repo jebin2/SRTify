@@ -10,11 +10,12 @@ body {
 	align-items: center;
 	min-height: 80vh;
 	background-image: radial-gradient(circle, #333 0%, #121212 100%);
-  }
-  
-  .container {
+}
+
+.container {
 	width: 80%;
-  	max-width: 1024px; /* Increased max-width to better suit 1280x720 */
+	max-width: 1024px;
+	/* Increased max-width to better suit 1280x720 */
 	padding: 30px;
 	background-color: #1a1a1a;
 	border: 4px solid #6a4bb7;
@@ -22,54 +23,56 @@ body {
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 	text-align: center;
 	transition: transform 0.3s ease;
-  }
-  
-  .container:hover {
+}
+
+.container:hover {
 	transform: scale(1.05);
-  }
-  
-  header {
+}
+
+header {
 	margin-bottom: 20px;
 	border-bottom: 3px dashed #6a4bb7;
-  }
-  
-  h1 {
+}
+
+h1 {
 	margin-top: 0;
 	color: #6a4bb7;
 	font-size: 2.8em;
 	margin-bottom: 10px;
 	text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
-  }
-  
-  p {
+}
+
+p {
 	color: #bbb;
 	font-size: 1.2em;
-  }
-  
-  .input-area {
+}
+
+.input-area {
 	display: flex;
 	flex-direction: column;
-	gap: 20px; /* Reduced gap for better spacing */
+	gap: 20px;
+	/* Reduced gap for better spacing */
 	margin-bottom: 30px;
-  }
-  
-  .input-group {
+}
+
+.input-group {
 	display: flex;
 	align-items: center;
-	gap: 10px; /* Reduced gap */
-  }
-  
-  .input-group label {
+	gap: 10px;
+	/* Reduced gap */
+}
+
+.input-group label {
 	font-size: 1.1em;
 	width: 12%;
 	text-align: left;
 	color: #6a4bb7;
 	font-weight: bold;
 	text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
-  }
-  
-  input[type="text"],
-  select {
+}
+
+input[type="text"],
+select {
 	padding: 10px;
 	border: 2px solid #444;
 	border-radius: 6px;
@@ -78,18 +81,18 @@ body {
 	background-color: #222;
 	color: #f0f0f0;
 	font-family: 'Press Start 2P', monospace;
-  }
-  
-  select {
+}
+
+select {
 	appearance: none;
 	-webkit-appearance: none;
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23f0f0f0' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
 	background-repeat: no-repeat;
 	background-position: right 12px top 50%;
 	background-size: 18px;
-  }
-  
-  button {
+}
+
+button {
 	width: 20%;
 	background-color: #6a4bb7;
 	color: #fff;
@@ -100,24 +103,48 @@ body {
 	font-size: 1.1em;
 	transition: background-color 0.3s ease, transform 0.1s ease;
 	font-family: 'Press Start 2P', monospace;
-  }
-  
-  button:hover {
+}
+
+button:hover {
 	background-color: #006eff;
 	transform: scale(1.02);
+}
+
+.generate-button {
+    position: relative;
+    width: 100%;
+    margin-top: 15px;
+    padding: 15px;
+    overflow: hidden;
+    background-color: #6a4bb7;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.generate-button:hover {
+    background-color: #7856c6;
+}
+
+.generate-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.button-text {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    font-family: 'Press Start 2P', monospace;
   }
-  
-  .generate-button {
-	width: 100%;
-	margin-top: 15px;
-  }
-  
-  .output-area {
+
+.output-area {
 	margin-top: 30px;
 	text-align: left;
-  }
-  
-  #console {
+}
+
+#console {
 	background-color: #121212;
 	padding: 15px;
 	border: 2px solid #444;
@@ -130,48 +157,46 @@ body {
 	color: #ccc;
 	font-family: monospace;
 	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
-  }
-  
-  footer {
+}
+
+footer {
 	margin-top: 40px;
 	border-top: 3px dashed #6a4bb7;
 	color: #bbb;
 	font-size: 0.9em;
 	text-align: center;
-  }
-  
-  footer p {
+}
+
+footer p {
 	margin-bottom: 0;
-  }
-  
-  footer a {
+}
+
+footer a {
 	color: #6a4bb7;
-  }
-  
-  footer a:hover {
+}
+
+footer a:hover {
 	text-decoration: underline;
-  }
-  
-  body::before {
+}
+
+body::before {
 	content: "";
 	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background: repeating-linear-gradient(
-	  0deg,
-	  rgba(0, 0, 0, 0),
-	  rgba(0, 0, 0, 0) 1px,
-	  rgba(0, 0, 0, 0.1) 2px
-	);
+	background: repeating-linear-gradient(0deg,
+			rgba(0, 0, 0, 0),
+			rgba(0, 0, 0, 0) 1px,
+			rgba(0, 0, 0, 0.1) 2px);
 	pointer-events: none;
 	z-index: -1;
-  }
-  
-  
-  /* Styles for the dropdown menu */
-  .dropdown {
+}
+
+
+/* Styles for the dropdown menu */
+.dropdown {
 	position: absolute;
 	top: 100%;
 	left: 0;
@@ -183,16 +208,52 @@ body {
 	z-index: 10;
 	max-height: 200px;
 	overflow-y: auto;
-	display: none; /* Initially hidden */
-  }
-  
-  .dropdown-item {
+	display: none;
+	/* Initially hidden */
+}
+
+.dropdown-item {
 	padding: 12px;
 	cursor: pointer;
 	color: #f0f0f0;
 	font-family: 'Press Start 2P', monospace;
-  }
-  
-  .dropdown-item:hover {
+}
+
+.dropdown-item:hover {
 	background-color: #333;
-  }
+}
+
+/* CSS (add this to your CSS file or `<style>` tag) */
+.progress-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    z-index: 1;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #006eff;
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+.progress-label {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-size: 0.8em;
+    font-family: 'Press Start 2P', monospace;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.generating .progress-label {
+    opacity: 1;
+}
