@@ -1,18 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>SRTify</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRTify - Create Subtitles Made Simple</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            letter-spacing: -0.05em;
+            margin: 2rem 0;
+        }
+
+        .description {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            color: #ccc;
+            text-align: center;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: #fff;
+            color: #000;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        .cta-button:hover {
+            opacity: 0.9;
+        }
+
+        .screenshot {
+            margin: 4rem 0;
+            background: #111;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .dependencies {
+            border-top: 1px solid #333;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding: 2rem 0;
+            border-top: 1px solid #333;
+        }
+
+        a {
+            color: #fff;
+            text-decoration: none;
+            border-bottom: 1px solid #666;
+            transition: border-color 0.2s;
+        }
+
+        a:hover {
+            border-color: #fff;
+        }
+    </style>
 </head>
-
 <body>
-	<div class="container">
-		<header>
-			<h1>SRTify</h1>
-			<p>Generate Subtitles</p>
-		</header>
-</body>
+    <div class="container">
+        <header>
+            <h1>SRTify</h1>
+            <p class="description">Create accurate subtitles for video/audio files with AI-powered precision. Available for Windows, macOS, and Linux.</p>
+            <a href="#" class="cta-button">Download for macOS</a>
+        </header>
 
+        <div class="screenshot">
+            <!-- Replace with actual screenshot -->
+            <div style="background: #222; height: 400px; display: grid; place-items: center; color: #666;">
+                App Screenshot
+            </div>
+        </div>
+
+        <div class="dependencies">
+            <h3>Dependencies</h3>
+            <ul style="margin-top: 1rem; list-style: none;">
+                <li>• Tauri 2.0</li>
+                <li>• Whisper.cpp</li>
+                <li>• FFmpeg</li>
+            </ul>
+        </div>
+
+        <footer>
+            <p>
+                <a href="https://github.com/jebin2/srtify" target="_blank">View on GitHub</a> 
+                | 
+                <a href="/">Home</a>
+            </p>
+        </footer>
+    </div>
+</body>
 </html>
