@@ -4,7 +4,7 @@ use futures::StreamExt;
 use std::env;
 use std::fs;
 use tauri::{AppHandle, Emitter, Manager};
-use std::process::Command;
+use std::process::{Command, Stdio};
 use std::path::Path;
 use std::path::PathBuf;
 use std::fs::File;
@@ -192,6 +192,8 @@ pub fn extract_audio(video_path: &str, app: tauri::AppHandle) -> Result<String, 
             "-ac", "1",
             audio_output.to_str().unwrap(),
         ])
+        .stdout(Stdio::null())  // Suppress standard output
+        .stderr(Stdio::null())  // Suppress standard error
         .output()
         .expect("Failed to extract audio");
 
@@ -234,13 +236,13 @@ pub fn create_srt(subtitles: Vec<(String, f64, f64)>, app: tauri::AppHandle) -> 
         Ok(None) => return Err("Media file not found".into()),
         Err(e) => return Err(format!("Error loading model: {}", e).into()),
     };
-    let filename = format!("{}/output.srt", folder);
+    let file_path_buf = Path::new(&folder).join("output.srt");
 
-    if let Err(e) = fs::remove_file(&filename) {
+    if let Err(e) = fs::remove_file(&file_path_buf) {
         eprintln!("Failed to remove existing audio output file: {}", e);
     }
 
-    let mut file = File::create(&filename).map_err(|e| format!("Failed to create SRT file: {}", e))?;
+    let mut file = File::create(&file_path_buf).map_err(|e| format!("Failed to create SRT file: {}", e))?;
 
     for (i, (text, start_sec, end_sec)) in subtitles.iter().enumerate() {
         let start_time = sec_to_time_format(*start_sec);
@@ -249,13 +251,13 @@ pub fn create_srt(subtitles: Vec<(String, f64, f64)>, app: tauri::AppHandle) -> 
         writeln!(file, "{}\n{} --> {}\n{}\n", i + 1, start_time, end_time, text)
             .map_err(|e| format!("Failed to write to SRT file: {}", e))?;
     }
-    app.emit("subtitle_created", format!("Subtitle Created :: {}", filename)).unwrap_or_else(|e| {
+    app.emit("subtitle_created", format!("Subtitle Created :: {}", file_path_buf.to_str().unwrap().to_string())).unwrap_or_else(|e| {
         eprintln!("Emit error: {}", e);
     });
     app.emit("info", "End").unwrap_or_else(|e| {
         eprintln!("Emit error: {}", e);
     });
-    Ok(filename)
+    Ok(file_path_buf.to_str().unwrap().to_string())
 }
 
 pub async fn download_model(url: &str, model_name: &str, app: AppHandle) -> Result<PathBuf, Box<dyn Error>> {
@@ -265,6 +267,15 @@ pub async fn download_model(url: &str, model_name: &str, app: AppHandle) -> Resu
     let model_path = srtify_dir.join(model_name);
     
     if Path::new(&model_path).exists() {
+        let complete_event = serde_json::json!({
+            "status": "download_complete",
+            "model": model_name,
+            "path": model_path.to_str(),
+            "progress": 100
+        });
+        app.emit("download_complete", complete_event).unwrap_or_else(|e| {
+            eprintln!("Emit error: {}", e);
+        });
         return Ok(model_path);
     }
 
@@ -327,7 +338,7 @@ pub async fn download_model(url: &str, model_name: &str, app: AppHandle) -> Resu
         "path": model_path.to_str(),
         "progress": 100
     });
-    app.emit("download_progress", complete_event).unwrap_or_else(|e| {
+    app.emit("download_complete", complete_event).unwrap_or_else(|e| {
         eprintln!("Emit error: {}", e);
     });
 

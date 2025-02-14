@@ -73,6 +73,10 @@ listen('download_progress', (event) => {
     setGeneratingState(true);
     updateProgress(parseInt(event.payload.progress), "download")
 });
+listen('download_complete', (event) => {
+    setGeneratingState(true);
+    appendConsoleMessage(`<span style="color:green">${event.payload.path}</span>`);
+});
 
 // --- UI Update Functions ---
 function setGeneratingState(isGenerating) {
