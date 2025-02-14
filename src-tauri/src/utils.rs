@@ -249,7 +249,7 @@ pub fn create_srt(subtitles: Vec<(String, f64, f64)>, app: tauri::AppHandle) -> 
         writeln!(file, "{}\n{} --> {}\n{}\n", i + 1, start_time, end_time, text)
             .map_err(|e| format!("Failed to write to SRT file: {}", e))?;
     }
-    app.emit("subtitle_created", format!("Subtitle Created At{}", filename)).unwrap_or_else(|e| {
+    app.emit("subtitle_created", format!("Subtitle Created :: {}", filename)).unwrap_or_else(|e| {
         eprintln!("Emit error: {}", e);
     });
     app.emit("info", "End").unwrap_or_else(|e| {
