@@ -76,6 +76,7 @@ function setGeneratingState(isGenerating) {
     generateSubtitleButton.classList.toggle('generating', isGenerating);
     
     if (!isGenerating) {
+        updateProgress(100);
         buttonTextElement.innerText = "Generate Subtitle";
     }
 }
