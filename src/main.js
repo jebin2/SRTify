@@ -17,7 +17,8 @@ async function invokeAPI(method, ...args) {
         return await invoke(method, ...args);
     } catch (error) {
         console.error(`Error invoking ${method}:`, error);
-        alert(`Error invoking ${method}: ${error}`);
+        alert(`${error}`);
+        setGeneratingState(false);
         throw error;
     }
 }
@@ -34,6 +35,12 @@ function autoScrollConsole() {
 // --- Event Listeners for Tauri Events ---
 listen('info', (event) => {
     appendConsoleMessage(event.payload);
+});
+listen('error', (event) => {
+    appendConsoleMessage(`<span style="color:red">${event.payload}</span>`);
+});
+listen('success', (event) => {
+    appendConsoleMessage(`<span style="color:green">${event.payload}</span>`);
 });
 
 listen('transcription_started', () => {
@@ -75,7 +82,6 @@ listen('download_progress', (event) => {
 });
 listen('download_complete', (event) => {
     setGeneratingState(true);
-    appendConsoleMessage(`<span style="color:green">${event.payload.path}</span>`);
 });
 
 // --- UI Update Functions ---
@@ -95,7 +101,6 @@ async function selectFile(isModel) {
     if (filePath) {
         const inputElement = isModel ? modelInput : mediaFileInput;
         inputElement.value = filePath;
-        await saveSelection(isModel ? "model" : "file", filePath);
     }
 }
 
@@ -103,7 +108,6 @@ async function selectFolder() {
     const folderPath = await invokeAPI("select_folder");
     if (folderPath) {
         outputDirInput.value = folderPath;
-        await saveSelection("folder", folderPath);
     }
 }
 
@@ -115,22 +119,10 @@ function showDropdown() {
 async function selectModel(model) {
     modelInput.value = model;
     hideDropdown();
-    await saveSelection("model", modelInput.value);
 }
 
 function hideDropdown() {
     modelDropdown.style.display = "none";
-}
-
-// --- Saving Selection ---
-async function saveSelection(key, value) {
-    try {
-        await invokeAPI("save_selection", { data: { key, value } });
-        console.log(`Saved ${key}: ${value}`);
-    } catch (error) {
-        console.error(`Error saving ${key}:`, error);
-        alert(`Error saving ${key}: ${error}`);
-    }
 }
 
 // --- Event Listeners for Buttons ---
@@ -142,6 +134,13 @@ generateSubtitleButton.addEventListener("click", async () => {
     max_progress = 0;
     progressBar.style.width = '0%';
     consoleElement.innerHTML = ""
+    await invokeAPI("save_selection", {
+        data: [
+            { key: "model", value: modelInput.value },
+            { key: "file", value: mediaFileInput.value },
+            { key: "folder", value: outputDirInput.value }
+        ]
+    });
     await invokeAPI("start_transcription");
 });
 

@@ -60,7 +60,7 @@ pub async fn select_file(is_model: bool) -> String {
 }
 
 #[tauri::command]
-pub fn save_selection(data: MetaData, app: AppHandle) -> Result<(), String> {
+pub fn save_selection(data: Vec<MetaData>, app: AppHandle) -> Result<(), String> {
     let temp_dir = env::temp_dir();
     let srtify_dir = temp_dir.join("srtify");
 
@@ -73,7 +73,6 @@ pub fn save_selection(data: MetaData, app: AppHandle) -> Result<(), String> {
         let file_content = fs::read_to_string(&file_path).map_err(|e| e.to_string())?;
         let mut data: SelectedData = serde_json::from_str(&file_content).map_err(|e| e.to_string())?;
 
-        // Ensure the model is not null, empty, or None after deserialization
         if data.model.is_none() || data.model.as_deref() == Some("null") || data.model.as_deref() == Some("") {
             data.model = Some("whisper".to_string());
         }
@@ -83,23 +82,24 @@ pub fn save_selection(data: MetaData, app: AppHandle) -> Result<(), String> {
         SelectedData::default()
     };
 
-    // Update the selected data based on the key
-    match data.key.as_str() {
+    // Iterate through the array and update selected_data accordingly
+    for entry in data {
+        match entry.key.as_str() {
         "model" => {
-            // Set the model value, ensuring it's not null, empty, or None
-            selected_data.model = match data.value.as_str() {
-                "" | "null" | "none" => Some("whisper".to_string()), // Default to "whisper"
-                _ => Some(data.value),
+                selected_data.model = match entry.value.as_str() {
+                    "" | "null" | "none" => Some("whisper".to_string()),
+                    _ => Some(entry.value),
             };
         }
         "file" => {
-            selected_data.file_path = Some(data.value);
+                selected_data.file_path = Some(entry.value);
         }
         "folder" => {
-            selected_data.folder_path = Some(data.value);
+                selected_data.folder_path = Some(entry.value);
         }
         _ => {
-            return Err(format!("Unknown key: {}", data.key));
+                return Err(format!("Unknown key: {}", entry.key));
+            }
         }
     }
 
@@ -149,9 +149,9 @@ pub fn load_selection(key: String) -> Result<Option<String>, String> {
 fn get_ffmpeg_path(app: tauri::AppHandle) -> Result<PathBuf, String> {
     let target_os = std::env::consts::OS;
     let path = match target_os {
-        "linux" => Ok("bin/linux-x64/ffmpeg"),
-        "macos" => Ok("bin/macos-x64/ffmpeg"),
-        "windows" => Ok("bin/win32-x64/ffmpeg.exe"),
+        "linux" => Ok("bin/dependency/ffmpeg"),
+        "macos" => Ok("bin/dependency/ffmpeg"),
+        "windows" => Ok("bin/dependency/ffmpeg.exe"),
         _ => Err(format!("Unsupported target OS: {}", target_os)),
     }?;
     let resource_path = app.path()
@@ -260,29 +260,15 @@ pub fn create_srt(subtitles: Vec<(String, f64, f64)>, app: tauri::AppHandle) -> 
     Ok(file_path_buf.to_str().unwrap().to_string())
 }
 
-pub async fn download_model(url: &str, model_name: &str, app: AppHandle) -> Result<PathBuf, Box<dyn Error>> {
-    let temp_dir = env::temp_dir();
-    let srtify_dir = temp_dir.join("srtify");
-    fs::create_dir_all(&srtify_dir).expect("Failed to create srtify directory");
-    let model_path = srtify_dir.join(model_name);
-    
+pub async fn download_model(url: &str, model_path: &str, app: AppHandle) -> Result<PathBuf, Box<dyn Error>> {
     if Path::new(&model_path).exists() {
-        let complete_event = serde_json::json!({
-            "status": "download_complete",
-            "model": model_name,
-            "path": model_path.to_str(),
-            "progress": 100
-        });
-        app.emit("download_complete", complete_event).unwrap_or_else(|e| {
-            eprintln!("Emit error: {}", e);
-        });
-        return Ok(model_path);
+        return Ok(PathBuf::from(model_path));
     }
 
     // Emit download start event
     let start_event = serde_json::json!({
         "status": "download_start",
-        "model": model_name,
+        "model": model_path,
         "progress": 0.0
     });
     app.emit("download_progress", start_event).unwrap_or_else(|e| {
@@ -321,7 +307,7 @@ pub async fn download_model(url: &str, model_name: &str, app: AppHandle) -> Resu
         // Emit progress update
         let progress_event = serde_json::json!({
             "status": "download_progress",
-            "model": model_name,
+            "model": model_path,
             "progress": progress,
             "downloaded": downloaded,
             "total_size": total_size
@@ -334,15 +320,15 @@ pub async fn download_model(url: &str, model_name: &str, app: AppHandle) -> Resu
     // Emit completion event
     let complete_event = serde_json::json!({
         "status": "download_complete",
-        "model": model_name,
-        "path": model_path.to_str(),
+        "model": model_path,
+        "path": model_path,
         "progress": 100
     });
     app.emit("download_complete", complete_event).unwrap_or_else(|e| {
         eprintln!("Emit error: {}", e);
     });
 
-    Ok(model_path)
+    Ok(PathBuf::from(model_path))
 }
 
 pub fn get_audio_duration(file_path: &str) -> Result<f64, hound::Error> {

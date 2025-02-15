@@ -4,7 +4,7 @@
 	"version": "0.1.0",
 	"type": "module",
 	"scripts": {
-		"postinstall": "chmod +x src-tauri/bin/linux-x64/ffmpeg && chmod +x src-tauri/bin/macos-x64/ffmpeg",
+		"postinstall": "node build_perm.js",
 		"tauri": "tauri"
 	},
 	"devDependencies": {
