@@ -5,7 +5,8 @@
 	"type": "module",
 	"scripts": {
 		"postinstall": "node build_perm.js",
-		"tauri": "tauri"
+		"tauri": "tauri",
+		"push": "git push && git checkout main && git pull origin main && git checkout release && git merge main && git push origin release && git checkout main"
 	},
 	"devDependencies": {
 		"@tauri-apps/cli": "^2.2.7"
