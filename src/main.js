@@ -55,7 +55,7 @@ listen('transcription_progress', (event) => {
     let durationString = event.payload.split("duration: ")[1];
     let startTime = parseFloat(startTimeString);
     let duration = parseFloat(durationString);
-    
+
     if (duration > 0 && startTime >= 0) {
         let percentage = (startTime / duration) * 100;
         percentage = Math.min(Math.max(percentage, 0), 100);
@@ -89,7 +89,7 @@ listen('download_complete', (event) => {
 function setGeneratingState(isGenerating) {
     generateSubtitleButton.disabled = isGenerating;
     generateSubtitleButton.classList.toggle('generating', isGenerating);
-    
+
     if (!isGenerating) {
         updateProgress(100);
         buttonTextElement.innerText = "Generate Subtitle";
@@ -182,5 +182,5 @@ function updateProgress(progress, type) {
         }
     }
     progressBar.style.width = `${max_progress}%`;
-    buttonTextElement.innerText = type == "download" ? "Downloading Model... "+max_progress+"%" : "Generating Subtitle... "+max_progress+"%";
+    buttonTextElement.innerText = type == "download" ? "Downloading Model... " + max_progress + "%" : "Generating Subtitle... " + max_progress + "%";
 }

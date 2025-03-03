@@ -9,7 +9,12 @@
 	<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&display=swap"
 		rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-	<script defer src="main.js"></script>
+	<script defer src="main.js" type="module"></script>
+	<script>
+		function openURL(url) {
+			window.__TAURI__.opener.openUrl(url);
+		}
+	</script>
 </head>
 
 <body>
@@ -67,7 +72,7 @@
 
 		<footer>
 			<p>
-				<a href="https://github.com/jebin2" target="_blank" rel="noopener noreferrer" class="cp">
+				<a href="#" onclick="openURL('https://github.com/jebin2')" class="cp">
 					<img src="assets/github-mark-white.png" alt="GitHub logo" style="width: 40px;" />
 				</a>
 			</p>

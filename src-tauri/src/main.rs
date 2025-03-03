@@ -4,10 +4,12 @@
 mod transcriber;
 mod local_server;
 mod utils;
+use tauri_plugin_opener;
 
 #[tokio::main]
 async fn main() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
         .setup(|_app| {
             // Spawn the local HTTP server
             tokio::spawn(async {
