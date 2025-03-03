@@ -184,3 +184,7 @@ function updateProgress(progress, type) {
     progressBar.style.width = `${max_progress}%`;
     buttonTextElement.innerText = type == "download" ? "Downloading Model... " + max_progress + "%" : "Generating Subtitle... " + max_progress + "%";
 }
+
+function openURL(url) {
+    window.__TAURI__.opener.openUrl(url);
+}
