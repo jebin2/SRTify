@@ -6,6 +6,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>SRTify</title>
 	<link rel="stylesheet" href="styles.css">
+	<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;900&display=swap"
+		rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 	<script defer src="main.js"></script>
 </head>
 
@@ -20,42 +23,44 @@
 			<div class="input-group">
 				<label for="model">Whisper Model:</label>
 				<div style="position: relative; flex-grow: 1; max-width: 80%;">
-				  <input id="model" type="text" onclick="showDropdown()" placeholder="whisper-base" style="width: -webkit-fill-available;">
-				  <div id="modelDropdown" class="dropdown two">
-					<div class="dropdown-item" onclick="selectModel('whisper-base')">whisper-base</div>
-					<div class="dropdown-item" onclick="selectModel('whisper-tiny')">whisper-tiny</div>
-					<div class="dropdown-item" onclick="selectModel('whisper-small')">whisper-small</div>
-					<div class="dropdown-item" onclick="selectModel('whisper-medium')">whisper-medium</div>
-					<div class="dropdown-item" onclick="selectModel('whisper-large-v1')">whisper-large-v1</div>
-					<div class="dropdown-item" onclick="selectModel('whisper-large-v2')">whisper-large-v2</div>
-					<div class="dropdown-item" onclick="selectModel('whisper-large-v3')">whisper-large-v3</div>
-					<div class="dropdown-item" onclick="selectModel('whisper-large-v3-turbo')">whisper-large-v3-turbo</div>
-				  </div>
+					<input id="model" type="text" onclick="showDropdown()" placeholder="whisper-base"
+						style="width: -webkit-fill-available;">
+					<div id="modelDropdown" class="dropdown two">
+						<div class="dropdown-item" onclick="selectModel('whisper-base')">whisper-base</div>
+						<div class="dropdown-item" onclick="selectModel('whisper-tiny')">whisper-tiny</div>
+						<div class="dropdown-item" onclick="selectModel('whisper-small')">whisper-small</div>
+						<div class="dropdown-item" onclick="selectModel('whisper-medium')">whisper-medium</div>
+						<div class="dropdown-item" onclick="selectModel('whisper-large-v1')">whisper-large-v1</div>
+						<div class="dropdown-item" onclick="selectModel('whisper-large-v2')">whisper-large-v2</div>
+						<div class="dropdown-item" onclick="selectModel('whisper-large-v3')">whisper-large-v3</div>
+						<div class="dropdown-item" onclick="selectModel('whisper-large-v3-turbo')">
+							whisper-large-v3-turbo</div>
+					</div>
 				</div>
-				<button id="modelFile" class="cp three">Select Whisper Model</button>
-			  </div>
+				<button id="modelFile" class="cp three">SELECT MODEL</button>
+			</div>
 
 			<div class="input-group">
 				<label for="mediaFile" class="one">Media File:</label>
 				<input id="mediaFile" class="two" type="text" placeholder="Enter file path">
-				<button id="selectFile" class="cp three">Select File</button>
+				<button id="selectFile" class="cp three">SELECT FILE</button>
 			</div>
 
 			<div class="input-group">
 				<label for="outputDir" class="one">Output Directory:</label>
 				<input id="outputDir" class="two" type="text" placeholder="Select Output Directory">
-				<button id="selectFolder" class="cp three">Select Folder</button>
+				<button id="selectFolder" class="cp three">SELECT FOLDER</button>
 			</div>
 
 			<button id="generateSubtitle" class="generate-button cp">
-                <span class="button-text">Generate Subtitle</span>
-                <div class="progress-container">
-                    <div class="progress-bar">
-                    </div>
-                </div>
-            </button>
-
+				<span class="button-text">GENERATE SUBTITLE</span>
+				<div class="progress-container">
+					<div class="progress-bar">
+					</div>
+				</div>
+			</button>
 		</div>
+
 		<div class="output-area">
 			<h2>Console Output</h2>
 			<pre id="console"></pre>

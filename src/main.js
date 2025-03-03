@@ -4,6 +4,7 @@ const listen = window.__TAURI__.event.listen;
 const consoleElement = document.getElementById("console");
 const generateSubtitleButton = document.getElementById("generateSubtitle");
 const progressBar = generateSubtitleButton.querySelector('.progress-bar');
+const progressContainer = generateSubtitleButton.querySelector('.progress-container');
 const buttonTextElement = generateSubtitleButton.querySelector('.button-text');
 const modelInput = document.getElementById("model");
 const mediaFileInput = document.getElementById("mediaFile");
@@ -93,6 +94,7 @@ function setGeneratingState(isGenerating) {
         updateProgress(100);
         buttonTextElement.innerText = "Generate Subtitle";
     }
+    progressContainer.style.display = isGenerating ? "block" : "none";
 }
 
 // --- File/Folder Selection Logic ---
