@@ -228,7 +228,7 @@ button:active {
 	background: var(--bg-secondary);
 	border-radius: var(--border-radius);
 	padding: 1.5rem;
-	max-height: 40vh;
+	max-height: 28vh;
 	border: 4px solid var(--text-primary);
 	box-shadow: var(--box-shadow);
 	position: relative;
