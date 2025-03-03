@@ -32,16 +32,13 @@ body {
 .container {
 	height: 100vh;
 	margin: 0 auto;
-	padding: 1.5rem;
 	display: flex;
 	flex-direction: column;
 }
 
 header {
 	text-align: center;
-	margin-bottom: 2rem;
 	padding: 1.5rem 0;
-	border-bottom: 4px solid var(--accent-color);
 	position: relative;
 }
 
@@ -265,7 +262,7 @@ button:active {
 	color: var(--text-primary);
 	font-size: 1rem;
 	padding: 1rem;
-	height: calc(100% - 3.5rem);
+	height: 100%;
 	line-height: 1.6;
 	font-weight: 500;
 	text-wrap: wrap;
@@ -305,8 +302,6 @@ button:active {
 footer {
 	text-align: center;
 	padding: 1.5rem 0;
-	border-top: 4px solid var(--accent-color);
-	margin-top: 1.5rem;
 	flex-shrink: 0;
 }
 
