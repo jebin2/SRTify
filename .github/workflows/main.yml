@@ -2,6 +2,11 @@ name: 'publish'
 
 on:
   workflow_dispatch:
+    inputs:
+      toolchain:
+        description: 'Rust toolchain version'
+        required: true
+        default: 'stable'
   push:
     branches:
       - release
