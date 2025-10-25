@@ -22,24 +22,22 @@
             background: #000;
             color: #fff;
             line-height: 1.6;
-            overflow-x: hidden;
             display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            flex-direction: column
         }
 
         .container {
             flex: 1;
             max-width: 1200px;
             margin: 0 auto;
-            /* padding: 2rem; */
+            width: 100%;
             display: flex;
             flex-direction: column;
         }
 
         header {
             text-align: center;
-            margin-bottom: 1rem;
+            padding: 2rem 0 1rem 0;
             gap: 15px;
         }
 
@@ -80,10 +78,12 @@
             width: 100%;
             max-width: 1000px;
             margin: 0 auto;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            padding-top: 56.25%;
+            /* 16:9 Aspect Ratio */
             border-radius: 8px;
             overflow: hidden;
-            border: 2px solid #fff; /* Added white border */
+            border: 2px solid #fff;
+            /* Added white border */
         }
 
         .screenshot img {
@@ -93,18 +93,19 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            border-radius: 6px; /* Slightly smaller to account for container border */
-            padding: 8px; /* Added padding to create space between image and border */
+            border-radius: 6px;
+            /* Slightly smaller to account for container border */
+            padding: 8px;
+            /* Added padding to create space between image and border */
         }
 
         footer {
             text-align: center;
             padding: 1.5rem 0;
-            border-top: 1px solid #333;
             display: flex;
             justify-content: center;
             gap: 2rem;
-            margin-top: auto;
+            /* margin-top: auto; */
         }
 
         a {
@@ -163,8 +164,19 @@
 
         @media (max-width: 768px) {
             .screenshot {
-                padding-top: 75%; /* 4:3 Aspect Ratio for mobile */
+                padding-top: 75%;
+                /* 4:3 Aspect Ratio for mobile */
             }
+        }
+
+        iframe {
+            flex: 1; /* This is the magic! It makes the iframe fill all available space */
+            width: 100%; /* Make it fill the container's width */
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #000; /* Ensure its background matches the site */
+            min-height: 0; /* A flexbox fix to prevent overflow issues */
         }
     </style>
 </head>
@@ -174,15 +186,22 @@
         <header>
             <h1>SRTify</h1>
             <p class="description">Create accurate subtitles for video/audio files with AI-powered precision.</p>
-            <a href="https://github.com/jebin2/SRTify/releases/download/app-v0.1.0/SRTify_0.1.0_x64-setup.exe" class="cta-button">Download for Windows</a>
-            <a href="https://github.com/jebin2/SRTify/releases/download/app-v0.1.0/SRTify_0.1.0_amd64.deb" class="cta-button">Download for Linux</a>
-            <a href="https://github.com/jebin2/SRTify/releases/download/app-v0.1.0/SRTify_0.1.0_aarch64.dmg" class="cta-button">Download for macOS</a>
+            <a href="https://github.com/jebin2/SRTify/releases/download/app-v0.1.0/SRTify_0.1.0_x64-setup.exe"
+                class="cta-button">Download for Windows</a>
+            <a href="https://github.com/jebin2/SRTify/releases/download/app-v0.1.0/SRTify_0.1.0_amd64.deb"
+                class="cta-button">Download for Linux</a>
+            <a href="https://github.com/jebin2/SRTify/releases/download/app-v0.1.0/SRTify_0.1.0_aarch64.dmg"
+                class="cta-button">Download for macOS</a>
             <a href="https://github.com/jebin2/SRTify/releases" class="cta-button">Other Downloads</a>
         </header>
 
-        <div class="screenshot">
-            <img src="./image.png" alt="SRTify Screenshot" />
-        </div>
+        <iframe src="https://jebin2.github.io/MediaBunnyPlayer/player.html?video_url=https://raw.githubusercontent.com/jebin2/SRTify/abb2991b74c2784476a205b86adf8ad46ba1020e/dashboard/demo.mp4
+&only_video_player=true&auto_play=true&bg_color=000000" allow="autoplay; encrypted-media" allowfullscreen>
+        </iframe>
+        <!-- video-container set this website bg color to this media player -->
+         <!-- <iframe src="http://localhost:8080/player.html?video_url=https://raw.githubusercontent.com/jebin2/SRTify/abb2991b74c2784476a205b86adf8ad46ba1020e/dashboard/demo.mp4
+&only_video_player=true&auto_play=true&bg_color=000" allow="autoplay; encrypted-media" allowfullscreen>
+        </iframe> -->
 
         <footer>
             <a href="https://github.com/jebin2/srtify" target="_blank">GitHub</a>
@@ -212,7 +231,7 @@
             document.getElementById('dependencyModal').style.display = 'none';
         }
 
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             const modal = document.getElementById('dependencyModal');
             if (event.target === modal) {
                 closeModal();
