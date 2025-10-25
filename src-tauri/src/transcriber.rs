@@ -6,7 +6,7 @@ use std::env;
 use std::fs;
 
 use crate::utils::{
-    create_srt, download_model, extract_audio, get_audio_duration, is_video_or_audio,
+    create_srt, create_json, download_model, extract_audio, get_audio_duration, is_video_or_audio,
     load_selection,
 };
 use std::path::Path;
@@ -118,19 +118,22 @@ async fn transcribe_with_whisper(
     model_name: &str,
     app: AppHandle,
 ) -> Result<()> {
-    if let Some("video") = is_video_or_audio(&file_path).as_deref() {
-        app.emit("info", "Extracting audio using ffmpeg via command line").unwrap_or_else(|e| {
-            eprintln!("Emit error: {}", e);
-        });
-        let app_clone = app.clone();
-        file_path = match extract_audio(&file_path, app_clone) {
-            Ok(path) => path,
-            Err(_) => return Err(anyhow::anyhow!("Error in extract_audio")),
-        };
-        app.emit("info", "Extracted audio using ffmpeg via command line").unwrap_or_else(|e| {
-            eprintln!("Emit error: {}", e);
-        });
+    if let Some(media_type) = is_video_or_audio(&file_path).as_deref() {
+        if media_type == "video" || media_type == "audio" {
+            app.emit("info", "Extracting/Converting audio to WAV using ffmpeg").unwrap_or_else(|e| {
+                eprintln!("Emit error: {}", e);
+            });
+            let app_clone = app.clone();
+            file_path = match extract_audio(&file_path, app_clone) {
+                Ok(path) => path,
+                Err(_) => return Err(anyhow::anyhow!("Error in extract_audio")),
+            };
+            app.emit("info", "Audio ready in WAV format").unwrap_or_else(|e| {
+                eprintln!("Emit error: {}", e);
+            });
+        }
     }
+
     let mut file = File::open(file_path.clone())?;
     let mut buffer = Vec::new();
     file.read_to_end(&mut buffer)?;
@@ -156,6 +159,7 @@ async fn transcribe_with_whisper(
     let mut state = ctx.create_state()?;
 
     let mut params = FullParams::new(SamplingStrategy::Greedy { best_of: 1 });
+    params.set_token_timestamps(true);
     params.set_print_realtime(false);
     params.set_print_progress(false);
     params.set_print_timestamps(false);
@@ -172,7 +176,7 @@ async fn transcribe_with_whisper(
 
     params.set_segment_callback_safe(move |data: whisper_rs::SegmentCallbackData| {
         let message = format!(
-            "test: {} start_time: {:.2} end_time:{:.2} duration: {:.2}",
+            "Transcription: {} start_time: {:.2} end_time:{:.2} duration: {:.2}",
             data.text.clone(),
             data.start_timestamp as f64 * 0.01,
             data.end_timestamp as f64 * 0.01,
@@ -199,8 +203,48 @@ async fn transcribe_with_whisper(
             eprintln!("Emit error: {}", e);
         });
 
-    if let Err(e) = create_srt(subtitles.lock().unwrap().clone(), app) {
+    if let Err(e) = create_srt(subtitles.lock().unwrap().clone(), app.clone()) {
         eprintln!("Error creating SRT: {}", e);
+    }
+
+    // --- Word-level extraction ---
+    let mut all_segments = Vec::new();
+    let n_segments = state.full_n_segments()?;
+
+    for i in 0..n_segments {
+        let segment_start = state.full_get_segment_t0(i)? as f64 * 0.01;
+        let segment_end = state.full_get_segment_t1(i)? as f64 * 0.01;
+        let text = state.full_get_segment_text(i)?;
+
+        let mut words = Vec::new();
+        let n_tokens = state.full_n_tokens(i)?;
+        for j in 0..n_tokens {
+            let token_text = state.full_get_token_text(i, j)?;
+            let token_data = state.full_get_token_data(i, j)?;
+            let token_t0 = token_data.t0;
+            let token_t1 = token_data.t1;
+
+            // Only include tokens that have timing info
+            if token_t0 >= 0 && token_t1 >= 0 {
+                words.push(serde_json::json!({
+                    "word": token_text.trim(),
+                    "start": token_t0 as f64 * 0.01,
+                    "end": token_t1 as f64 * 0.01
+                }));
+            }
+        }
+
+        all_segments.push(serde_json::json!({
+            "text": text.trim(),
+            "start": segment_start,
+            "end": segment_end,
+            "words": words
+        }));
+    }
+
+    // Save JSON file
+    if let Err(e) = create_json(all_segments, app.clone()) {
+        eprintln!("Error creating JSON: {}", e);
     }
 
     Ok(())

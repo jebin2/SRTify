@@ -11,6 +11,7 @@ use std::fs::File;
 use std::io::Write;
 use std::error::Error;
 use hound::WavReader;
+use serde_json::json;
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct SelectedData {
@@ -48,8 +49,10 @@ pub async fn select_file(is_model: bool) -> String {
     } else {
         FileDialog::new()
             .set_directory(".")
-            .add_filter("Video files", &["mp4", "avi", "mkv"])  // Video files
-            .add_filter("Audio files", &["mp3", "wav", "flac", "aac"])  // Audio files
+            .add_filter("Media files", &[
+                "mp4", "avi", "mkv", "mov", "flv", "wmv", "webm", // video
+                "mp3", "wav", "flac", "aac", "ogg", "m4a"         // audio
+            ])
             .pick_file()
     };
 
@@ -257,6 +260,36 @@ pub fn create_srt(subtitles: Vec<(String, f64, f64)>, app: tauri::AppHandle) -> 
     app.emit("info", "End").unwrap_or_else(|e| {
         eprintln!("Emit error: {}", e);
     });
+    Ok(file_path_buf.to_str().unwrap().to_string())
+}
+
+pub fn create_json(segments: Vec<serde_json::Value>, app: tauri::AppHandle) -> Result<String, Box<dyn Error>> {
+    let folder_res = load_selection("folder".to_string());
+
+    let folder = match folder_res {
+        Ok(Some(m)) => m,
+        Ok(None) => return Err("Output folder not found".into()),
+        Err(e) => return Err(format!("Error loading output folder: {}", e).into()),
+    };
+
+    let file_path_buf = Path::new(&folder).join("output.json");
+
+    if let Err(e) = fs::remove_file(&file_path_buf) {
+        eprintln!("Failed to remove existing JSON file: {}", e);
+    }
+
+    let json_data = json!({ "segments": segments });
+
+    let mut file = File::create(&file_path_buf).map_err(|e| format!("Failed to create JSON file: {}", e))?;
+    file.write_all(serde_json::to_string_pretty(&json_data)?.as_bytes())?;
+
+    app.emit("subtitle_created", format!("JSON Created :: {}", file_path_buf.to_str().unwrap().to_string())).unwrap_or_else(|e| {
+        eprintln!("Emit error: {}", e);
+    });
+    app.emit("info", "End").unwrap_or_else(|e| {
+        eprintln!("Emit error: {}", e);
+    });
+
     Ok(file_path_buf.to_str().unwrap().to_string())
 }
 
