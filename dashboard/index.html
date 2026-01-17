@@ -170,13 +170,17 @@
         }
 
         iframe {
-            flex: 1; /* This is the magic! It makes the iframe fill all available space */
-            width: 100%; /* Make it fill the container's width */
+            flex: 1;
+            /* This is the magic! It makes the iframe fill all available space */
+            width: 100%;
+            /* Make it fill the container's width */
             border: none;
             border-radius: 12px;
             overflow: hidden;
-            background-color: #000; /* Ensure its background matches the site */
-            min-height: 0; /* A flexbox fix to prevent overflow issues */
+            background-color: #000;
+            /* Ensure its background matches the site */
+            min-height: 0;
+            /* A flexbox fix to prevent overflow issues */
         }
     </style>
 </head>
@@ -195,11 +199,12 @@
             <a href="https://github.com/jebin2/SRTify/releases" class="cta-button">Other Downloads</a>
         </header>
 
-        <iframe src="https://jebin2.github.io/MediaBunnyPlayer/player.html?video_url=https://raw.githubusercontent.com/jebin2/SRTify/abb2991b74c2784476a205b86adf8ad46ba1020e/dashboard/demo.mp4
-&only_video_player=true&auto_play=true&bg_color=000000" allow="autoplay; encrypted-media" allowfullscreen>
+        <iframe
+            src="/JellyJump/embed.html?video_url=https://raw.githubusercontent.com/jebin2/SRTify/abb2991b74c2784476a205b86adf8ad46ba1020e/dashboard/demo.mp4&autoplay=1"
+            allow="autoplay; encrypted-media" allowfullscreen>
         </iframe>
         <!-- video-container set this website bg color to this media player -->
-         <!-- <iframe src="http://localhost:8080/player.html?video_url=https://raw.githubusercontent.com/jebin2/SRTify/abb2991b74c2784476a205b86adf8ad46ba1020e/dashboard/demo.mp4
+        <!-- <iframe src="http://localhost:8080/player.html?video_url=https://raw.githubusercontent.com/jebin2/SRTify/abb2991b74c2784476a205b86adf8ad46ba1020e/dashboard/demo.mp4
 &only_video_player=true&auto_play=true&bg_color=000" allow="autoplay; encrypted-media" allowfullscreen>
         </iframe> -->
 
